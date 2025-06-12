@@ -1,0 +1,11 @@
+pandas
+numpy
+matplotlib
+seaborn
+beautifulsoup4
+lxml
+nltk
+spacy
+transformers
+textblob
+vaderSentiment
