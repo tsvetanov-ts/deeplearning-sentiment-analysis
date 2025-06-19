@@ -13,3 +13,8 @@ rich
 scikit-learn
 plotly
 cufflinks
+transformers
+torch
+datasets
+optuna
+accelerate
