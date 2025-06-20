@@ -1,0 +1,503 @@
+{
+  "tfidf_logistic_regression": {
+    "negative": {
+      "positive": [
+        {
+          "feature": "sluggish",
+          "importance": 2.7871442128135753
+        },
+        {
+          "feature": "low",
+          "importance": 2.8172113958644767
+        },
+        {
+          "feature": "wrong",
+          "importance": 3.01131234839542
+        },
+        {
+          "feature": "annoying",
+          "importance": 3.0681626710010823
+        },
+        {
+          "feature": "awful",
+          "importance": 3.077087850226804
+        },
+        {
+          "feature": "worse",
+          "importance": 3.100938095704138
+        },
+        {
+          "feature": "useless",
+          "importance": 3.10308474376009
+        },
+        {
+          "feature": "disappointment",
+          "importance": 3.1626090280623744
+        },
+        {
+          "feature": "disappointing",
+          "importance": 3.2038802556255352
+        },
+        {
+          "feature": "dead",
+          "importance": 3.387796610295091
+        },
+        {
+          "feature": "hate",
+          "importance": 3.665068775775528
+        },
+        {
+          "feature": "uncomfortable",
+          "importance": 4.821136561786385
+        },
+        {
+          "feature": "terrible",
+          "importance": 4.837335215472614
+        },
+        {
+          "feature": "kia",
+          "importance": 4.851706926147309
+        },
+        {
+          "feature": "disappointed",
+          "importance": 5.148095070469224
+        },
+        {
+          "feature": "problem",
+          "importance": 5.249308527069882
+        },
+        {
+          "feature": "horrible",
+          "importance": 5.397490736496516
+        },
+        {
+          "feature": "bad",
+          "importance": 5.5666895471420865
+        },
+        {
+          "feature": "poor",
+          "importance": 6.020813488087842
+        },
+        {
+          "feature": "worst",
+          "importance": 6.340920327622045
+        }
+      ],
+      "negative": [
+        {
+          "feature": "great",
+          "importance": -9.348712100826504
+        },
+        {
+          "feature": "love",
+          "importance": -9.313023328718607
+        },
+        {
+          "feature": "best",
+          "importance": -5.409972543287987
+        },
+        {
+          "feature": "excellent",
+          "importance": -5.160450788697653
+        },
+        {
+          "feature": "better",
+          "importance": -4.851165739316777
+        },
+        {
+          "feature": "comfortable",
+          "importance": -4.8345922758041056
+        },
+        {
+          "feature": "fun",
+          "importance": -4.594164699705695
+        },
+        {
+          "feature": "good",
+          "importance": -4.41650084057454
+        },
+        {
+          "feature": "like",
+          "importance": -3.9908967306186596
+        },
+        {
+          "feature": "well",
+          "importance": -3.875326560268044
+        },
+        {
+          "feature": "easy",
+          "importance": -3.5567504626848763
+        },
+        {
+          "feature": "awesome",
+          "importance": -3.392109043736888
+        },
+        {
+          "feature": "amazing",
+          "importance": -3.386099593002132
+        },
+        {
+          "feature": "nice",
+          "importance": -3.2152451467222694
+        },
+        {
+          "feature": "pretty",
+          "importance": -3.1606942844899955
+        },
+        {
+          "feature": "fit",
+          "importance": -3.1402457585131653
+        },
+        {
+          "feature": "happy",
+          "importance": -3.0560964662148264
+        },
+        {
+          "feature": "perfect",
+          "importance": -2.817388892108769
+        },
+        {
+          "feature": "comfort",
+          "importance": -2.785031105688949
+        },
+        {
+          "feature": "quiet",
+          "importance": -2.7765426863480656
+        }
+      ]
+    },
+    "neutral": {
+      "positive": [
+        {
+          "feature": "going",
+          "importance": 0.9475189758053004
+        },
+        {
+          "feature": "fluid",
+          "importance": 0.9527091444111631
+        },
+        {
+          "feature": "car class",
+          "importance": 0.9623958774781299
+        },
+        {
+          "feature": "spare",
+          "importance": 0.9637366249084395
+        },
+        {
+          "feature": "imagine",
+          "importance": 1.0158692556921485
+        },
+        {
+          "feature": "double",
+          "importance": 1.026901880969083
+        },
+        {
+          "feature": "end",
+          "importance": 1.0488549013886697
+        },
+        {
+          "feature": "service",
+          "importance": 1.0567826496299768
+        },
+        {
+          "feature": "much room",
+          "importance": 1.0635443052768414
+        },
+        {
+          "feature": "annoying",
+          "importance": 1.1791675250957552
+        },
+        {
+          "feature": "terrible",
+          "importance": 1.223127857017379
+        },
+        {
+          "feature": "negative",
+          "importance": 1.2683430745324575
+        },
+        {
+          "feature": "disappointed",
+          "importance": 1.3075898475968637
+        },
+        {
+          "feature": "noise",
+          "importance": 1.3102322391085623
+        },
+        {
+          "feature": "kia",
+          "importance": 1.3219414258015634
+        },
+        {
+          "feature": "get mpg",
+          "importance": 1.3443827670665411
+        },
+        {
+          "feature": "dealer",
+          "importance": 1.346356404439114
+        },
+        {
+          "feature": "camry",
+          "importance": 1.4338927217172035
+        },
+        {
+          "feature": "complaint",
+          "importance": 1.5500158000077648
+        },
+        {
+          "feature": "paint",
+          "importance": 2.471925793345284
+        }
+      ],
+      "negative": [
+        {
+          "feature": "great",
+          "importance": -5.793088984089354
+        },
+        {
+          "feature": "love",
+          "importance": -5.129786892553789
+        },
+        {
+          "feature": "best",
+          "importance": -3.1899588529302223
+        },
+        {
+          "feature": "comfortable",
+          "importance": -3.146371760748947
+        },
+        {
+          "feature": "good",
+          "importance": -2.9815892505910244
+        },
+        {
+          "feature": "well",
+          "importance": -2.393256171323235
+        },
+        {
+          "feature": "like",
+          "importance": -2.053307931123691
+        },
+        {
+          "feature": "better",
+          "importance": -2.0467841652475376
+        },
+        {
+          "feature": "excellent",
+          "importance": -2.0407177369119505
+        },
+        {
+          "feature": "comfort",
+          "importance": -2.0350066235678637
+        },
+        {
+          "feature": "happy",
+          "importance": -2.005781883720613
+        },
+        {
+          "feature": "awesome",
+          "importance": -1.8898397796125113
+        },
+        {
+          "feature": "fit",
+          "importance": -1.7566837829267707
+        },
+        {
+          "feature": "fun",
+          "importance": -1.7432782992198048
+        },
+        {
+          "feature": "ride",
+          "importance": -1.7388967899272632
+        },
+        {
+          "feature": "amazing",
+          "importance": -1.5705140425615307
+        },
+        {
+          "feature": "drive",
+          "importance": -1.5416989540701025
+        },
+        {
+          "feature": "car",
+          "importance": -1.5180073860569134
+        },
+        {
+          "feature": "loved",
+          "importance": -1.5163695708976337
+        },
+        {
+          "feature": "easy",
+          "importance": -1.4949405072729687
+        }
+      ]
+    },
+    "positive": {
+      "positive": [
+        {
+          "feature": "loved",
+          "importance": 2.9385798657764033
+        },
+        {
+          "feature": "perfect",
+          "importance": 3.286147107910592
+        },
+        {
+          "feature": "pretty",
+          "importance": 3.331232766800051
+        },
+        {
+          "feature": "comfort",
+          "importance": 3.554775506167371
+        },
+        {
+          "feature": "fit",
+          "importance": 3.562289750986931
+        },
+        {
+          "feature": "nice",
+          "importance": 3.586134403720715
+        },
+        {
+          "feature": "easy",
+          "importance": 3.9588712868047633
+        },
+        {
+          "feature": "happy",
+          "importance": 3.968961688008932
+        },
+        {
+          "feature": "amazing",
+          "importance": 3.9831699694030203
+        },
+        {
+          "feature": "awesome",
+          "importance": 4.1724184212911215
+        },
+        {
+          "feature": "well",
+          "importance": 4.586137711041009
+        },
+        {
+          "feature": "like",
+          "importance": 4.657886066960929
+        },
+        {
+          "feature": "fun",
+          "importance": 4.674140031253213
+        },
+        {
+          "feature": "better",
+          "importance": 5.267881312708471
+        },
+        {
+          "feature": "good",
+          "importance": 5.372274959653131
+        },
+        {
+          "feature": "excellent",
+          "importance": 5.671000089176764
+        },
+        {
+          "feature": "comfortable",
+          "importance": 5.844588518100425
+        },
+        {
+          "feature": "best",
+          "importance": 6.482314398566498
+        },
+        {
+          "feature": "love",
+          "importance": 10.710237825838979
+        },
+        {
+          "feature": "great",
+          "importance": 10.92201385331855
+        }
+      ],
+      "negative": [
+        {
+          "feature": "worst",
+          "importance": -6.0707701714938676
+        },
+        {
+          "feature": "poor",
+          "importance": -5.954588040132774
+        },
+        {
+          "feature": "terrible",
+          "importance": -5.334994617090387
+        },
+        {
+          "feature": "bad",
+          "importance": -5.307347092200369
+        },
+        {
+          "feature": "disappointed",
+          "importance": -5.298158727965961
+        },
+        {
+          "feature": "kia",
+          "importance": -5.131611431120814
+        },
+        {
+          "feature": "horrible",
+          "importance": -5.045703414585048
+        },
+        {
+          "feature": "problem",
+          "importance": -4.728365808843574
+        },
+        {
+          "feature": "uncomfortable",
+          "importance": -4.7226457849660175
+        },
+        {
+          "feature": "annoying",
+          "importance": -3.4925305273308256
+        },
+        {
+          "feature": "hate",
+          "importance": -3.4898606497600606
+        },
+        {
+          "feature": "dead",
+          "importance": -3.1935563370083773
+        },
+        {
+          "feature": "wrong",
+          "importance": -3.0114116562834177
+        },
+        {
+          "feature": "worse",
+          "importance": -2.879839198929983
+        },
+        {
+          "feature": "disappointing",
+          "importance": -2.8684784648409853
+        },
+        {
+          "feature": "awful",
+          "importance": -2.8346001206056957
+        },
+        {
+          "feature": "warning",
+          "importance": -2.830555349871021
+        },
+        {
+          "feature": "useless",
+          "importance": -2.820929333840294
+        },
+        {
+          "feature": "sluggish",
+          "importance": -2.779464954119305
+        },
+        {
+          "feature": "disappointment",
+          "importance": -2.6972241701686688
+        }
+      ]
+    }
+  },
+  "word2vec_similarities": {}
+}
