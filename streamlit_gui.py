@@ -28,24 +28,24 @@ def load_models():
 
     # Load DistilBERT model
     from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
-    distilbert_tokenizer = DistilBertTokenizer.from_pretrained("./best_distilbert_sentiment")
-    distilbert_model = DistilBertForSequenceClassification.from_pretrained("./best_distilbert_sentiment")
+    distilbert_tokenizer = DistilBertTokenizer.from_pretrained("./distilbert_sentiment")
+    distilbert_model = DistilBertForSequenceClassification.from_pretrained("./distilbert_sentiment")
 
-    comparison_df = pd.read_csv("model_metrics.csv")
-    detailed_metrics = pd.read_csv("detailed_metrics.csv")
-    sentiment_counts = pd.read_csv("sentiment_distribution.csv")
+    # comparison_df = pd.read_csv("model_metrics.csv")
+    # detailed_metrics = pd.read_csv("detailed_metrics.csv")
+    # sentiment_counts = pd.read_csv("sentiment_distribution.csv")
 
     # Load traditional ML models
     tfidf_lr_pipeline = pickle.load(open("tfidf_lr_model.pkl", "rb"))
-    bow_nb_pipeline = pickle.load(open("bow_nb_model.pkl", "rb"))
+    # bow_nb_pipeline = pickle.load(open("bow_nb_model.pkl", "rb"))
 
-    with open("confusion_matrices.json", "r") as f:
-        confusion_matrices = json.load(f)
-        for model in confusion_matrices:
-            confusion_matrices[model] = np.array(confusion_matrices[model])
-
-    with open("feature_importance.json", "r") as f:
-        feature_importance = json.load(f)
+    # with open("confusion_matrices.json", "r") as f:
+    #     confusion_matrices = json.load(f)
+    #     for model in confusion_matrices:
+    #         confusion_matrices[model] = np.array(confusion_matrices[model])
+    #
+    # with open("feature_importance.json", "r") as f:
+    #     feature_importance = json.load(f)
 
     lemmatizer = WordNetLemmatizer()
     stop_words = set(stopwords.words('english'))
@@ -58,14 +58,14 @@ def load_models():
         "distilbert_tokenizer": distilbert_tokenizer,
         "distilbert_model": distilbert_model,
         "tfidf_lr": tfidf_lr_pipeline,
-        "bow_nb": bow_nb_pipeline,
+        # "bow_nb": bow_nb_pipeline,
         "lemmatizer": lemmatizer,
         "stop_words": stop_words,
-        "comparison_df": comparison_df,
-        "detailed_metrics": detailed_metrics,
-        "sentiment_counts": sentiment_counts,
-        "confusion_matrices": confusion_matrices,
-        "feature_importance": feature_importance
+        # "comparison_df": comparison_df,
+        # "detailed_metrics": detailed_metrics,
+        # "sentiment_counts": sentiment_counts,
+        # "confusion_matrices": confusion_matrices,
+        # "feature_importance": feature_importance
 
     }
 
@@ -484,6 +484,7 @@ def main():
         - Deep learning:
           - RoBERTa transformer model
           - BERT transformer model
+          - DistilBERT transformer model
 
         #### Data:
         The models were trained on a dataset containing over 40,000 car reviews covering multiple brands and models from 2007-2009.
