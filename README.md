@@ -35,3 +35,19 @@ Optimization techniques used:
 ## Colab notebook
 
 The Jupyter notebook from Google Colab is also available in the repo. It is named `colab_sentiment_analysis.ipynb`. Here's link to Colab: [Sentiment Analysis Colab](https://colab.research.google.com/drive/1YI6isePSJgh7T5xiKNGKKiFfNI1Tp_LJ?usp=sharing)
+
+## Final verdict
+
+RoBERTa is best by small margin.
+
+![Algos-compared](roberta.png)
+
+Even better after fine-tuning with Optuna and 10 runs with 5 epochs each. 
+Best trial is run 3:
+![Runs-compared](best_run.png )
+
+``` Trial 3 finished with value: 0.9413173652694611 and parameters: {'learning_rate': 1.2045772387019983e-05, 'batch_size': 16, 'weight_decay': 0.05107146688206066}```
+
+
+![Params-importance](hyperparams.png )
+
