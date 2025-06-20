@@ -34,4 +34,4 @@ Optimization techniques used:
 
 ## Colab notebook
 
-The Jupyter notebook from Google Colab is also available in the repo. It is named `sentiment_analysis_colab.ipynb`. Here's link to Colab: [Sentiment Analysis Colab](https://colab.research.google.com/github/yourusername/sentiment_analysis/blob/main/sentiment_analysis_colab.ipynb)
+The Jupyter notebook from Google Colab is also available in the repo. It is named `colab_sentiment_analysis.ipynb`. Here's link to Colab: [Sentiment Analysis Colab](https://colab.research.google.com/drive/1YI6isePSJgh7T5xiKNGKKiFfNI1Tp_LJ?usp=sharing)
