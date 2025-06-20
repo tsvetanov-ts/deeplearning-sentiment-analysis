@@ -12,8 +12,8 @@ import re
 from wordcloud import WordCloud
 import pickle
 import json
-
-
+import os
+import plotly.express as px
 # Load your saved models
 @st.cache_resource
 def load_models():
@@ -32,20 +32,37 @@ def load_models():
     distilbert_model = DistilBertForSequenceClassification.from_pretrained("./distilbert_sentiment")
 
     # comparison_df = pd.read_csv("model_metrics.csv")
-    # detailed_metrics = pd.read_csv("detailed_metrics.csv")
-    # sentiment_counts = pd.read_csv("sentiment_distribution.csv")
+    detailed_metrics = pd.read_csv("detailed_metrics.csv")
+    sentiment_counts = pd.read_csv("sentiment_distribution.csv")
 
     # Load traditional ML models
-    tfidf_lr_pipeline = pickle.load(open("tfidf_lr_model.pkl", "rb"))
-    # bow_nb_pipeline = pickle.load(open("bow_nb_model.pkl", "rb"))
+    # tfidf_lr_pipeline = pickle.load(open("tfidf_lr_model.pkl", "rb"))
+    bow_nb_pipeline = pickle.load(open("bow_nb_model.pkl", "rb"))
 
-    # with open("confusion_matrices.json", "r") as f:
-    #     confusion_matrices = json.load(f)
-    #     for model in confusion_matrices:
-    #         confusion_matrices[model] = np.array(confusion_matrices[model])
-    #
-    # with open("feature_importance.json", "r") as f:
-    #     feature_importance = json.load(f)
+    lr_model_path = "tfidf_lr_model.pkl"  # Path to your saved model
+    if os.path.exists(lr_model_path):
+        lr_model_tfidf = pickle.load(open(lr_model_path, "rb"))
+        #st.success("Model loaded successfully!")
+    else:
+        st.error(f"Model file {lr_model_path} not found. Please train the model first.")
+        lr_model_tfidf = None
+
+
+    bow_nb_path = "bow_nb_model.pkl"  # Path to your saved model
+    if os.path.exists(bow_nb_path):
+        bow_nb_model = pickle.load(open(bow_nb_path, "rb"))
+        #st.success("Model loaded successfully!")
+    else:
+        st.error(f"Model file {bow_nb_path} not found. Please train the model first.")
+        bow_nb_model = None
+
+    with open("confusion_matrices.json", "r") as f:
+        confusion_matrices = json.load(f)
+        for model in confusion_matrices:
+            confusion_matrices[model] = np.array(confusion_matrices[model])
+
+    with open("feature_importance.json", "r") as f:
+        feature_importance = json.load(f)
 
     lemmatizer = WordNetLemmatizer()
     stop_words = set(stopwords.words('english'))
@@ -57,15 +74,15 @@ def load_models():
         "bert_model": bert_model,
         "distilbert_tokenizer": distilbert_tokenizer,
         "distilbert_model": distilbert_model,
-        "tfidf_lr": tfidf_lr_pipeline,
-        # "bow_nb": bow_nb_pipeline,
+        "tfidf_lr": lr_model_tfidf,
+        "bow_nb": bow_nb_model,
         "lemmatizer": lemmatizer,
         "stop_words": stop_words,
         # "comparison_df": comparison_df,
-        # "detailed_metrics": detailed_metrics,
-        # "sentiment_counts": sentiment_counts,
-        # "confusion_matrices": confusion_matrices,
-        # "feature_importance": feature_importance
+        "detailed_metrics": detailed_metrics,
+        "sentiment_counts": sentiment_counts,
+        "confusion_matrices": confusion_matrices,
+        "feature_importance": feature_importance
 
     }
 
@@ -103,7 +120,6 @@ def analyze_sentiment(text, models):
 
     results = {}
 
-    # RoBERTa prediction
     # RoBERTa prediction
     inputs = models["tokenizer"](text, return_tensors="pt", truncation=True, max_length=512)
     with torch.no_grad():
@@ -155,7 +171,7 @@ def analyze_sentiment(text, models):
         "all_scores": dict(zip(models["tfidf_lr"].classes_, tfidf_probs))
     }
 
-    # BOW + Naive Bayes
+    #BOW + Naive Bayes
     bow_pred = models["bow_nb"].predict([text])[0]
     bow_probs = models["bow_nb"].predict_proba([text])[0]
     results["BOW + NB"] = {
@@ -277,231 +293,339 @@ def main():
                     st.subheader("Cleaned Text")
                     st.write(cleaned_text)
 
+    # elif choice == "Model Comparison":
+
     elif choice == "Model Comparison":
-        st.header("Model Performance Comparison")
+        st.title("Model Comparison")
 
-        # Load performance metrics
-        # metrics = {
-        #     "BOW + NB": {"Accuracy": 0.82, "F1": 0.81, "Training Time": 2.5},
-        #     "TF-IDF + NB": {"Accuracy": 0.83, "F1": 0.82, "Training Time": 3.2},
-        #     "BOW + LR": {"Accuracy": 0.84, "F1": 0.83, "Training Time": 5.1},
-        #     "TF-IDF + LR": {"Accuracy": 0.86, "F1": 0.85, "Training Time": 6.3},
-        #     "GloVe + LR": {"Accuracy": 0.87, "F1": 0.86, "Training Time": 1.2},
-        #     "GloVe + NB": {"Accuracy": 0.85, "F1": 0.84, "Training Time": 0.5},
-        #     "RoBERTa": {"Accuracy": 0.91, "F1": 0.90, "Training Time": 280}
-        # }
-        #
-        # metrics_df = pd.DataFrame(metrics).T.reset_index()
-        # metrics_df = pd.melt(metrics_df, id_vars=["index"], var_name="Metric", value_name="Value")
-        # metrics_df.rename(columns={"index": "Model"}, inplace=True)
+        # Load model metrics from CSV
+        try:
+            model_metrics = pd.read_csv('model_metrics.csv')
+            detailed_metrics = pd.read_csv('detailed_metrics.csv')
 
-        comparison_df = models["comparison_df"]
-        metrics_df = comparison_df
-        metrics_df = pd.melt(metrics_df, id_vars=["index"], var_name="Metric", value_name="Value")
-        metrics_df.rename(columns={"index": "Model"}, inplace=True)
+            # Load confusion matrices from JSON
+            with open('confusion_matrices.json', 'r') as f:
+                confusion_matrices = json.load(f)
 
-        metric_to_show = st.radio("Choose metric to display:", ["Accuracy", "F1", "Training Time"])
+            # Load feature importance if available
+            feature_importance = None
+            try:
+                with open('feature_importance.json', 'r') as f:
+                    feature_importance = json.load(f)
+            except:
+                pass
 
-        filtered_df = metrics_df[metrics_df["Metric"] == metric_to_show]
+            # Load sentiment distribution
+            try:
+                sentiment_distribution = pd.read_csv('sentiment_distribution.csv')
+            except:
+                sentiment_distribution = None
 
-        fig, ax = plt.subplots(figsize=(12, 6))
-        barplot = sns.barplot(x="Model", y="Value", data=filtered_df, ax=ax)
-        plt.title(f"Model Comparison - {metric_to_show}")
-        plt.xticks(rotation=45)
+            # Display overall metrics
+            st.header("Model Performance Comparison")
 
-        # Add value labels on bars
-        for i, bar in enumerate(barplot.patches):
-            barplot.text(
-                bar.get_x() + bar.get_width() / 2.,
-                bar.get_height() + 0.01,
-                f"{filtered_df['Value'].iloc[i]:.2f}",
-                ha="center", va="bottom"
+            # Format the dataframe for display
+            display_metrics = model_metrics.copy()
+            display_metrics['Accuracy'] = display_metrics['Accuracy'].map(lambda x: f"{x:.4f}")
+            display_metrics['F1 Score (weighted)'] = display_metrics['F1 Score (weighted)'].map(lambda x: f"{x:.4f}")
+
+            st.dataframe(display_metrics, use_container_width=True)
+
+            # Visualizations
+            st.subheader("Performance Metrics Visualization")
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+                # Convert to numeric for plotting
+                model_metrics['Accuracy'] = pd.to_numeric(model_metrics['Accuracy'])
+
+                fig = px.bar(
+                    model_metrics,
+                    x='Model',
+                    y='Accuracy',
+                    title="Model Accuracy Comparison",
+                    color='Model',
+                    text_auto='.4f'
+                )
+                fig.update_layout(yaxis_range=[0, 1])
+                st.plotly_chart(fig, use_container_width=True)
+
+            with col2:
+                model_metrics['F1 Score (weighted)'] = pd.to_numeric(model_metrics['F1 Score (weighted)'])
+
+                fig = px.bar(
+                    model_metrics,
+                    x='Model',
+                    y='F1 Score (weighted)',
+                    title="Model F1 Score Comparison",
+                    color='Model',
+                    text_auto='.4f'
+                )
+                fig.update_layout(yaxis_range=[0, 1])
+                st.plotly_chart(fig, use_container_width=True)
+
+            # Detailed metrics by class
+            st.header("Performance by Sentiment Class")
+
+            selected_metric = st.selectbox(
+                "Choose metric to visualize:",
+                ["Precision", "Recall", "F1-Score"]
             )
 
-        st.pyplot(fig)
+            fig = px.bar(
+                detailed_metrics,
+                x="Model",
+                y=selected_metric,
+                color="Class",
+                barmode="group",
+                title=f"{selected_metric} by Model and Sentiment Class",
+                text_auto='.3f'
+            )
+            st.plotly_chart(fig, use_container_width=True)
 
-        # Confusion matrices
-        st.subheader("Sample Confusion Matrices")
-        col1, col2 = st.columns(2)
+            # Confusion matrices
+            st.header("Confusion Matrices")
 
-        with col1:
-            st.markdown("#### TF-IDF + LR")
-            # cm_tfidf = np.array([[320, 45, 23], [52, 495, 88], [18, 76, 683]])
-            cm_tfidf = models["confusion_matrices"]["TF-IDF + LR"]
+            # Select model for confusion matrix
+            model_names = list(confusion_matrices.keys())
+            selected_model = st.selectbox("Select model for confusion matrix:", model_names)
 
-            fig, ax = plt.subplots(figsize=(8, 6))
-            sns.heatmap(cm_tfidf, annot=True, fmt='d', cmap='Blues',
-                        xticklabels=['Negative', 'Neutral', 'Positive'],
-                        yticklabels=['Negative', 'Neutral', 'Positive'], ax=ax)
-            plt.xlabel("Predicted")
-            plt.ylabel("Actual")
-            st.pyplot(fig)
+            if selected_model in confusion_matrices:
+                cm = np.array(confusion_matrices[selected_model])
 
-        with col2:
-            st.markdown("#### RoBERTa")
-            # cm_roberta = np.array([[345, 32, 11], [38, 525, 72], [12, 59, 706]])
-            cm_roberta = models["confusion_matrices"]["RoBERTa"]
-            fig, ax = plt.subplots(figsize=(8, 6))
-            sns.heatmap(cm_roberta, annot=True, fmt='d', cmap='Blues',
-                        xticklabels=['Negative', 'Neutral', 'Positive'],
-                        yticklabels=['Negative', 'Neutral', 'Positive'], ax=ax)
-            plt.xlabel("Predicted")
-            plt.ylabel("Actual")
-            st.pyplot(fig)
+                # Plot confusion matrix
+                fig = px.imshow(
+                    cm,
+                    text_auto=True,
+                    labels=dict(x="Predicted", y="True", color="Count"),
+                    x=['Negative', 'Neutral', 'Positive'],
+                    y=['Negative', 'Neutral', 'Positive'],
+                    title=f"Confusion Matrix: {selected_model}"
+                )
+                st.plotly_chart(fig, use_container_width=True)
+
+            # Feature importance visualization if available
+            if feature_importance:
+                st.header("Feature Importance")
+
+                importance_type = st.radio(
+                    "Feature importance type:",
+                    ["TF-IDF Logistic Regression", "Word2Vec Similarities"]
+                )
+
+                if importance_type == "TF-IDF Logistic Regression" and 'tfidf_logistic_regression' in feature_importance:
+                    sentiment = st.selectbox(
+                        "Select sentiment class:",
+                        ["negative", "neutral", "positive"]
+                    )
+
+                    if sentiment in feature_importance['tfidf_logistic_regression']:
+                        features = feature_importance['tfidf_logistic_regression'][sentiment]['positive']
+
+                        # Convert to dataframe for visualization
+                        feat_df = pd.DataFrame(features)
+                        feat_df = feat_df.sort_values('importance', ascending=False).head(15)
+
+                        fig = px.bar(
+                            feat_df,
+                            x='importance',
+                            y='feature',
+                            title=f"Top 15 Important Features for {sentiment.capitalize()} Sentiment",
+                            orientation='h'
+                        )
+                        st.plotly_chart(fig, use_container_width=True)
+
+                elif importance_type == "Word2Vec Similarities" and 'word2vec_similarities' in feature_importance:
+                    term = st.selectbox(
+                        "Select term:",
+                        list(feature_importance['word2vec_similarities'].keys())
+                    )
+
+                    if term in feature_importance['word2vec_similarities']:
+                        sim_df = pd.DataFrame(feature_importance['word2vec_similarities'][term])
+
+                        fig = px.bar(
+                            sim_df,
+                            x='similarity',
+                            y='word',
+                            title=f"Words Most Similar to '{term}'",
+                            orientation='h'
+                        )
+                        st.plotly_chart(fig, use_container_width=True)
+
+            # Sentiment distribution if available
+            if sentiment_distribution is not None:
+                st.header("Sentiment Distribution in Dataset")
+
+                fig = px.pie(
+                    sentiment_distribution,
+                    values='Count',
+                    names='Sentiment',
+                    title="Distribution of Sentiments in the Dataset",
+                    hole=0.4
+                )
+                st.plotly_chart(fig, use_container_width=True)
+
+        except Exception as e:
+            st.error(f"Error loading model comparison data: {str(e)}")
+            st.info(
+                "Please make sure model_metrics.csv, detailed_metrics.csv, and confusion_matrices.json files exist in the application directory.")
+
 
     elif choice == "Dataset Insights":
-        st.header("Car Review Dataset Insights")
+        st.title("Dataset Insights")
 
-        # Review count by sentiment
-        st.subheader("Sentiment Distribution in Dataset")
-        sentiment_counts = pd.DataFrame({
-            "Sentiment": ["Negative", "Neutral", "Positive"],
-            "Count": [8523, 14621, 19144]
-        })
+        # Load dataset if not already loaded
+        if 'df' not in st.session_state:
+            st.session_state.df = pd.read_csv('Out_182.csv')  # Replace with actual path
+            # Convert date column to datetime if needed
+            if 'date' in st.session_state.df.columns:
+                st.session_state.df['date'] = pd.to_datetime(st.session_state.df['date'])
 
-        fig, ax = plt.subplots(figsize=(10, 6))
-        sns.barplot(x="Sentiment", y="Count", data=sentiment_counts, palette=["red", "gray", "green"], ax=ax)
-        for i, bar in enumerate(ax.patches):
-            ax.text(
-                bar.get_x() + bar.get_width() / 2.,
-                bar.get_height() + 100,
-                f"{sentiment_counts['Count'].iloc[i]:,}",
-                ha="center", va="bottom"
-            )
-        st.pyplot(fig)
+        df = st.session_state.df
 
-        # Reviews by brand
-        st.subheader("Top Car Brands by Review Count")
-        brand_tab, model_tab, year_tab = st.tabs(["Brands", "Models", "Years"])
+        # Display basic dataset statistics
+        st.header("Dataset Overview")
+        st.write(f"Total reviews: {df.shape[0]:,}")
+        st.write(f"Time span: {df['date'].min().date()} to {df['date'].max().date()}")
+        st.write(f"Unique car brands: {df['brand'].nunique()}")
+        st.write(f"Unique car models: {df['model'].nunique()}")
 
-        with brand_tab:
-            brand_counts = pd.DataFrame({
-                "Brand": ["Toyota", "Honda", "Ford", "BMW", "Mercedes", "Audi", "Chevrolet", "Nissan"],
-                "Count": [5420, 4983, 4326, 3978, 3652, 3210, 2896, 2765]
-            })
+        # Display tabs for different insights
+        tabs = st.tabs(["Reviews Over Time", "Brands & Models", "Sentiment Analysis", "Favorites"])
+
+        # Reviews Over Time tab
+        with tabs[0]:
+            st.subheader("Reviews Distribution Over Time")
+            reviews_per_day = df.groupby(df['date'].dt.date).size().reset_index(name='reviews')
+
+            fig, ax = plt.subplots(figsize=(10, 6))
+            sns.histplot(reviews_per_day['reviews'], kde=True, ax=ax)
+            ax.set_title('Distribution of Daily Review Counts')
+            ax.set_xlabel('Number of Reviews per Day')
+            st.pyplot(fig)
+
+            # Top days with most reviews
+            st.subheader("Top Days with Most Reviews")
+            top_days = reviews_per_day.sort_values('reviews', ascending=False).head(10)
+            st.dataframe(top_days)
+
+        # Brands & Models tab
+        with tabs[1]:
+            st.subheader("Top Brands by Review Count")
+            brand_counts = df['brand'].value_counts().head(10)
+
+            fig, ax = plt.subplots(figsize=(10, 6))
+            brand_counts.plot.bar(ax=ax)
+            ax.set_title('Top 10 Most Reviewed Car Brands')
+            ax.set_ylabel('Number of Reviews')
+            st.pyplot(fig)
+
+            # Display top models for selected brand
+            selected_brand = st.selectbox("Select a brand to see top models:",
+                                          df['brand'].value_counts().head(20).index.tolist())
+
+            if selected_brand:
+                brand_df = df[df['brand'] == selected_brand]
+                model_counts = brand_df['model'].value_counts().head(10)
+
+                fig, ax = plt.subplots(figsize=(10, 6))
+                model_counts.plot.bar(ax=ax)
+                ax.set_title(f'Top Models for {selected_brand}')
+                ax.set_ylabel('Number of Reviews')
+                st.pyplot(fig)
+
+        # Sentiment Analysis tab
+        with tabs[2]:
+            st.subheader("Sentiment Distribution")
+
+            if 'vader_compound' not in df.columns:
+                st.warning("Sentiment scores not found in dataset. Run sentiment analysis first.")
+            else:
+                # Create sentiment label if not already present
+                if 'sentiment_label' not in df.columns:
+                    df['sentiment_label'] = pd.cut(
+                        df['vader_compound'],
+                        bins=[-1, -0.1, 0.1, 1],
+                        labels=['negative', 'neutral', 'positive']
+                    )
+
+                sentiment_counts = df['sentiment_label'].value_counts()
+
+                fig, ax = plt.subplots(figsize=(10, 6))
+                sentiment_counts.plot.pie(autopct='%1.1f%%', ax=ax)
+                ax.set_title('Review Sentiment Distribution')
+                st.pyplot(fig)
+
+                # Display sentiment over time
+                st.subheader("Sentiment Trends Over Time")
+
+                sentiment_by_date = df.groupby([df['date'].dt.date, 'sentiment_label']).size().unstack().fillna(0)
+                sentiment_by_date = sentiment_by_date.rolling(window=7).mean()  # 7-day moving average
+
+                fig, ax = plt.subplots(figsize=(12, 6))
+                sentiment_by_date.plot(ax=ax)
+                ax.set_title('7-Day Moving Average of Sentiment Counts')
+                ax.set_xlabel('Date')
+                ax.set_ylabel('Number of Reviews')
+                st.pyplot(fig)
+
+        # Favorites tab
+        with tabs[3]:
+            st.subheader("Most Common Favorites")
+
+            favorite_counts = df['favorite'].value_counts().reset_index()
+            favorite_counts.columns = ['Favorite', 'Count']
 
             fig, ax = plt.subplots(figsize=(12, 6))
-            sns.barplot(x="Brand", y="Count", data=brand_counts, ax=ax)
-            plt.xticks(rotation=45)
-            for i, bar in enumerate(ax.patches):
-                ax.text(
-                    bar.get_x() + bar.get_width() / 2.,
-                    bar.get_height() + 50,
-                    f"{brand_counts['Count'].iloc[i]:,}",
-                    ha="center", va="bottom"
-                )
+            sns.barplot(data=favorite_counts.head(15), x='Favorite', y='Count', ax=ax)
+            ax.set_title('Most Common Favorites', fontsize=14)
+            ax.set_xlabel('Favorite', fontsize=12)
+            ax.set_ylabel('Count', fontsize=12)
+            plt.xticks(rotation=45, ha='right')
             st.pyplot(fig)
 
-        with model_tab:
-            model_counts = pd.DataFrame({
-                "Model": ["Civic", "Camry", "Accord", "F-150", "Corolla", "3 Series", "Mustang", "Altima"],
-                "Count": [2105, 1983, 1826, 1738, 1650, 1523, 1487, 1320]
-            })
-
-            fig, ax = plt.subplots(figsize=(12, 6))
-            sns.barplot(x="Model", y="Count", data=model_counts, ax=ax)
-            plt.xticks(rotation=45)
-            for i, bar in enumerate(ax.patches):
-                ax.text(
-                    bar.get_x() + bar.get_width() / 2.,
-                    bar.get_height() + 50,
-                    f"{model_counts['Count'].iloc[i]:,}",
-                    ha="center", va="bottom"
-                )
-            st.pyplot(fig)
-
-        with year_tab:
-            year_counts = pd.DataFrame({
-                "Year": ["2007", "2008", "2009", "2010"],
-                "Count": [9823, 13652, 12485, 6828]
-            })
-
-            fig, ax = plt.subplots(figsize=(12, 6))
-            sns.barplot(x="Year", y="Count", data=year_counts, ax=ax)
-            for i, bar in enumerate(ax.patches):
-                ax.text(
-                    bar.get_x() + bar.get_width() / 2.,
-                    bar.get_height() + 50,
-                    f"{year_counts['Count'].iloc[i]:,}",
-                    ha="center", va="bottom"
-                )
-            st.pyplot(fig)
-
-        # Important features for sentiment
-        st.subheader("Important Words for Each Sentiment")
-        col1, col2, col3 = st.columns(3)
-
-        # Word clouds
-        with col1:
-            st.markdown("#### Positive Reviews")
-            positive_words = "excellent great amazing fantastic wonderful comfortable reliable smooth perfect powerful impressive handling quiet exceptional stylish elegant spacious quality premium luxury performance efficient economical satisfied solid fun enjoyable responsive"
-            wordcloud = WordCloud(width=400, height=400, background_color='white', colormap='Greens').generate(
-                positive_words)
-
-            fig, ax = plt.subplots(figsize=(8, 8))
-            ax.imshow(wordcloud, interpolation='bilinear')
-            ax.axis("off")
-            st.pyplot(fig)
-
-        with col2:
-            st.markdown("#### Neutral Reviews")
-            neutral_words = "okay decent average alright fair reasonable acceptable fine standard normal good bad adequate mediocre typical common basic regular expected usual ordinary middle sufficient consistent moderate"
-            wordcloud = WordCloud(width=400, height=400, background_color='white', colormap='Blues').generate(
-                neutral_words)
-
-            fig, ax = plt.subplots(figsize=(8, 8))
-            ax.imshow(wordcloud, interpolation='bilinear')
-            ax.axis("off")
-            st.pyplot(fig)
-
-        with col3:
-            st.markdown("#### Negative Reviews")
-            negative_words = "terrible horrible awful poor disappointing bad worse worst problem issue unreliable noisy uncomfortable rough expensive overpriced breakdown repair malfunction costly inefficient loud bumpy cheap plastic flimsy ineffective failure shortage"
-            wordcloud = WordCloud(width=400, height=400, background_color='white', colormap='Reds').generate(
-                negative_words)
-
-            fig, ax = plt.subplots(figsize=(8, 8))
-            ax.imshow(wordcloud, interpolation='bilinear')
-            ax.axis("off")
-            st.pyplot(fig)
+            # Top favorites table
+            st.dataframe(favorite_counts.head(20))
 
     else:  # About page
         st.header("About This Project")
+        st.write("""
+        ## Car Reviews Sentiment Analysis
 
-        st.markdown("""
-        ### Car Review Sentiment Analysis
+        This application demonstrates advanced natural language processing and sentiment analysis techniques applied to car reviews. 
+        The project analyzes consumer opinions to extract meaningful insights about vehicle preferences and satisfaction.
 
-        This project analyzes car reviews to determine sentiment (positive, negative, or neutral) using various natural language processing techniques.
+        ### Project Overview
+        - **Data Source**: Collection of car reviews with ratings, comments, and metadata
+        - **Analysis Goal**: Classify sentiment in car reviews as positive, neutral, or negative
+        - **Features**: Text analysis, sentiment classification, and visualization
 
-        #### Models Implemented:
-        - Traditional machine learning approaches:
-          - Bag of Words + Naive Bayes
-          - TF-IDF + Naive Bayes
-          - Bag of Words + Logistic Regression
-          - TF-IDF + Logistic Regression
-          - GloVe embeddings + Logistic Regression
-          - GloVe embeddings + Gaussian Naive Bayes
-        - Deep learning:
-          - RoBERTa transformer model
-          - BERT transformer model
-          - DistilBERT transformer model
+        ### Methodology
+        The project implements and compares multiple text classification approaches:
+        - **Traditional ML Models**:
+          - Bag-of-Words with Naive Bayes
+          - TF-IDF with Naive Bayes
+          - TF-IDF with Logistic Regression
+        - **Deep Learning Models**:
+          - BERT
+          - DistilBERT
+          - RoBERTa
 
-        #### Data:
-        The models were trained on a dataset containing over 40,000 car reviews covering multiple brands and models from 2007-2009.
+        ### Results
+        - Transformer models (BERT, RoBERTa) achieved the highest accuracy for sentiment classification
+        - Important features related to car performance, reliability, and comfort were identified
+        - Text embeddings revealed patterns in how consumers describe their vehicles
 
-        #### Applications:
-        - Automate sentiment analysis of customer feedback
-        - Identify strengths and weaknesses in specific car models
-        - Track consumer sentiment trends over time
-        - Compare consumer perception across different car brands
-
-        #### Technologies Used:
-        - Python for data analysis and modeling
-        - NLTK and spaCy for natural language processing
-        - scikit-learn for classical machine learning models
-        - Transformers library for RoBERTa implementation
-        - Streamlit for this interactive web application
+        ### Insights
+        This analysis helps understand consumer preferences and sentiment around different vehicle brands, models, and features.
         """)
+
+        st.write("---")
+        st.write("Created by: Tsvetanov, Tsvetan Tsvetanov")
+        st.write("Sentiment Analysis Project, 2025")
+        st.write("Introduction to Deep Learning, Faculty of Mathematics and Informatics, Sofia University, Bulgaria")
 
 
 if __name__ == "__main__":
